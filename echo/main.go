@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"net"
 	"os"
 )
@@ -36,18 +35,24 @@ func main() {
 			// Read data from the client
 
 			buffer := make([]byte, 1024)
-			bytesRead, err := c.Read(buffer)
 
-			if err != nil && err != io.EOF {
-				fmt.Println("Error reading from client:", err)
-				return
-			}
+			for {
+				bytesRead, err := c.Read(buffer)
 
-			// Echo back the received data
-			_, err = c.Write(buffer[:bytesRead])
+				fmt.Println(string(bytesRead))
 
-			if err != nil {
-				fmt.Println("Error writing to client:", err)
+				if err != nil {
+					fmt.Println("Error reading from client:", err)
+					return
+				}
+
+				// Echo back the received data
+				_, err = c.Write(buffer[:bytesRead])
+
+				if err != nil {
+					fmt.Println("Error writing to client:", err)
+				}
+
 			}
 
 		}(conn)
